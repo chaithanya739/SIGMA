@@ -19,8 +19,8 @@ Streaming = Stationary
 
 
 
-class FlexDPU_multiplier:
-    def __init__(self,stationary_holder) -> None: # this meant that init should always return none
+class FlexDPU_multiplier: # Flex DPE multipliers are nothing but processing elements in SIGMA. This class determines each unit of Flex DPU
+    def __init__(self,stationary_holder) -> None: 
         self.stationary_holder = stationary_holder
     def multiplier(self,streaming):
         multiplier_result =self.stationary_holder * streaming
@@ -81,7 +81,7 @@ def NumberofFlexDPE(non_zeroes_Stationary, Stationary_useful,Stationary_useles,t
                 count = count+1
                 del non_zeroes_Stationary[i][count-1]
 
-            if(Stationary_useful[i][j] != 0 and Stationary_useles[i][j] !=0):
+            if(Stationary_useful[i][j] != 0 and Stationary_useles[i][j] !=0): #The hardware requirement for determing the number of flex DPEs to be used.
                 count = count + 1
     cycle_count_inside_flexDPE = cycle_count_inside_flexDPE/len(Stationary_useful)
     totalcycle = totalcycle + cycle_count_inside_flexDPE
@@ -102,14 +102,14 @@ def NumberofFlexDPE(non_zeroes_Stationary, Stationary_useful,Stationary_useles,t
 
 
 
-def uselesselimination(bitmap_Stationary, bitmap_Streaming, totalcycle): #step ii ## only bitmap elements are eliminated and the non_zero elements are being eliminated in Number of Flex DPE
+def uselesselimination(bitmap_Stationary, bitmap_Streaming, totalcycle): #step ii
     Streaming_REGOR = []
     bitmap_Stationary_new = []
     REGOR_temp = 0    # this loop implements the Stationary matrix of step2 This will take only one cycle as they are executed in parallel.
     for i in range(len(bitmap_Streaming)):
         REGOR_temp = 0
-        for j in range(len(bitmap_Streaming[0])):
-            totalcycle = totalcycle+1
+        for j in range(len(bitmap_Streaming[0])): 
+            totalcycle = totalcycle+1 # Assuming the worst case of 2 input OR gate
             REGOR_temp = REGOR_temp or bitmap_Streaming[i][j]
         Streaming_REGOR.append(REGOR_temp)
     
@@ -117,9 +117,9 @@ def uselesselimination(bitmap_Stationary, bitmap_Streaming, totalcycle): #step i
     for i in range(len(bitmap_Stationary)):
         bitmap_Stationary_temp_fornew = []
         for j in range(len(Streaming_REGOR)):
-            bitmap_Stationary_temp_fornew.append(Streaming_REGOR[j] and bitmap_Stationary[i][j])
+            bitmap_Stationary_temp_fornew.append(Streaming_REGOR[j] and bitmap_Stationary[i][j]) 
         bitmap_Stationary_new.append(bitmap_Stationary_temp_fornew)
-    totalcycle = totalcycle + len(bitmap_Stationary)
+    totalcycle = totalcycle + len(bitmap_Stationary) # Assuming OR result is AND with each row as that is the worst possible case.
     return bitmap_Stationary_new, totalcycle
 
 def non_zeroes_per_row(A,bitmap_A):
@@ -197,7 +197,6 @@ print(totalcycle)
 
 non_zeroes_Stationary, bitmap_Stationary = bitmap_generator(Stationary)
 non_zeroes_Streaming, bitmap_Streaming = bitmap_generator(Streaming)
-#print("There are non_zeroes_Stationary, bitmap_Stationary\n",non_zeroes_Stationary, bitmap_Stationary)
 non_zeroes_Stationary_per_row= non_zeroes_per_row(non_zeroes_Stationary,bitmap_Stationary)
 non_zeroes_column_Streaming = nonzero_columnwise(Streaming)
 bitmap_streaming_transpose = Transpose(bitmap_Streaming)
