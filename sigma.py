@@ -8,21 +8,15 @@ from scipy.sparse import random
 from scipy import stats
 from numpy.random import default_rng
 import os
-#Stationary = [[0,3,4,3],[5,6,7,0],[8,9,4,0]]
-#Streaming = [[1,2,0,3],[0,4,5,0],[6,0,0,7],[0,0,0,0]]
-global No_of_multiplier_perDPE,FlexDPU_multiplier_ss,totalcycle
-No_of_multiplier_perDPE = 4
+#Initialization of number of multipliers per each DPE (which is processing element in SIGMA terms), total cycles determine the total number of cycles required for the total processing.
+global No_of_multiplier_perDPE,totalcycle 
+No_of_multiplier_perDPE = 4 # Number of multipliers per DPE is initialized to four.
 totalcycle=0
 
-#rng = default_rng()
-#rvs = stats.poisson(25, loc=10).rvs
-#Stationary = random(1024,1024, density=0.8, random_state=rng, data_rvs=rvs).toarray().astype(int)
-#Streaming = Stationary
-#S1 = random(512,512,density=0.8, random_state=rng,data_rvs=rvs)
-sparse_matrix = sp.io.mmread('M10PI_n1.mtx')
-Stationary = sparse_matrix.toarray().astype(int)
+sparse_matrix = sp.io.mmread('M10PI_n1.mtx') #loading the suite sparse matrix.
+Stationary = sparse_matrix.toarray().astype(int) 
 Streaming = Stationary
-#print("stationary", Stationary)
+
 
 
 class FlexDPU_multiplier:
@@ -212,6 +206,4 @@ non_zeroes_column_Streaming_per_row = non_zeroes_per_row(non_zeroes_column_Strea
 
 bitmap_Stationary_useful, totalcycle = uselesselimination(bitmap_Stationary,bitmap_Streaming, totalcycle) #step ii
 Stationary_per_flex_DPU,No_of_FlexDPE, non_zeroes_Stationary_entire, totalcycle = NumberofFlexDPE(non_zeroes_Stationary_per_row,bitmap_Stationary_useful,bitmap_Stationary, totalcycle) #step iii
-#print("output from Number of FlexDPE from step 3", Stationary_per_flex_DPU, No_of_FlexDPE, totalcycle)
-#print("output from step 4 Flex DPU multipliers assignment",FlexDPU_multiplier_ss,totalcycle)
 src_dest_pair(bitmap_Stationary_useful,bitmap_Streaming,Stationary_per_flex_DPU,non_zeroes_column_Streaming_per_row,non_zeroes_Stationary_entire,totalcycle) #step iv
